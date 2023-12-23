@@ -4,8 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineShoppingAPI", "OnlineShoppingAPI\OnlineShoppingAPI.csproj", "{C22923F3-CC07-489B-8169-032611C2110E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5A82DCF4-4B4F-4421-B628-EAABE23261DD} = {5A82DCF4-4B4F-4421-B628-EAABE23261DD}
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShoppingApp-Consumer", "OnlineShoppingApp-Consumer\OnlineShoppingApp-Consumer.csproj", "{5A82DCF4-4B4F-4421-B628-EAABE23261DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineShoppingApp_Consumer", "OnlineShoppingApp-Consumer\OnlineShoppingApp_Consumer.csproj", "{5A82DCF4-4B4F-4421-B628-EAABE23261DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

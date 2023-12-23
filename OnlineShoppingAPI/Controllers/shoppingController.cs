@@ -57,12 +57,6 @@ namespace OnlineShoppingAPI.Controllers
 
         }
 
-        //[HttpGet("{Loginid}/forgot")]
-        //public async Task<List<Login>> GetPassword(string loginid)
-        //{
-        //    return await _mongoDBService.SearchPassword(loginid);
-
-        //}
         [HttpGet("{Loginid}/forgot")]
         public async Task<ActionResult<string>> GetPassword(string loginid)
         {
@@ -120,12 +114,7 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
-        //[HttpPost("{ProductName}/update/{ProductId}")]
-        //public async Task<IActionResult> UpdateProd(int ProductId,  string ProductStatus, int StockCount)
-        //{
-        //    await _mongoDBService.UpdateProduct(ProductId, ProductStatus, StockCount);
-        //    return NoContent();
-        //}
+     
         [HttpPut("{ProductName}/update/{ProductId}")]
         public async Task<IActionResult> UpdateProd(ProductsLoginWrapper prodlog)
         {
@@ -153,13 +142,7 @@ namespace OnlineShoppingAPI.Controllers
             public Orders orders { get; set; }
             public Login login { get; set; }
         }
-        //[HttpGet("products/search/{ProductName}")]
-        //public async Task<List<Products>> Productsearch(string ProductName)
-        //{
-        //    return await _mongoDBService.SearchProduct(ProductName);
-
-        //}
-
+   
 
         [HttpGet("ListOrders")]
         public async Task<IActionResult> GetOrder(Login login)

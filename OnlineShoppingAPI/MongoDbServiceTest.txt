@@ -1,4 +1,4 @@
-﻿using OnlineShopping.Models;
+using OnlineShopping.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -43,6 +43,7 @@ namespace OnlineShopping.Services
 
         public async Task<string> CreateUser(Registration registration, Login login)
         {
+            //await _registrationCollection.InsertOneAsync(registration);
             if ((!IsLoginidExists(registration.Loginid)))
             {
                 if (!IsEmaildExists(registration.Email))
@@ -170,6 +171,7 @@ namespace OnlineShopping.Services
 
             var filter1 = Builders<Login>.Filter.Where(x => x.Loginid == loginid && x.Role == "Admin" && x.Password==password);
 
+            //var projection = Builders<Login>.Projection.Include(x => x.Role);
 
             var loginCheck = await _loginCollection.Find(filter1).FirstOrDefaultAsync();
 
@@ -195,6 +197,7 @@ namespace OnlineShopping.Services
 
         public async Task<bool> ProductExists(int pid, Orders order)
         {
+            //var filter1 = Builders<Products>.Filter.Eq(x => x.ProductId, pid);
             var filter2 = Builders<Products>.Filter.Eq(x => x.StockCount, pid);
             Console.Write(filter2);
             var orderIdCheck = _productsCollection.Find(p => p.ProductId == order.ProductId).Any();
@@ -258,6 +261,7 @@ namespace OnlineShopping.Services
             bool IsAdminTrue = await IsUserAdmin(login.Loginid, login.Password);
             if (IsAdminTrue)
             {
+                //var queryExpr = new BsonRegularExpression(new Regex(productName, RegexOptions.IgnoreCase));
                 var filter = Builders<Orders>.Filter.Eq("ProductName", productName);
                 var count = await _ordersCollection.Find(filter).CountDocumentsAsync();
                 return "Number of "+ productName +": " + Convert.ToInt32(count);
