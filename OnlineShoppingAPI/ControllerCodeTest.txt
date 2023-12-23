@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using DnsClient;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Win32;
 using OnlineShopping.Collection;
 using OnlineShopping.Services;
 using OnlineShoppingAPI.Collection;
@@ -16,15 +19,13 @@ namespace OnlineShoppingAPI.Controllers
         {
             _mongoDBService = mongoDBService;
         }
-
-        [HttpGet]
         public async Task<List<Registration>> Get()
         {
             return await _mongoDBService.GetAllUsers();
 
         }
 
-
+      
         public class RegistrationLoginWrapper
         {
             public Registration Registration { get; set; }
@@ -127,10 +128,10 @@ namespace OnlineShoppingAPI.Controllers
         //    return NoContent();
         //}
         [HttpPut("{ProductName}/update/{ProductId}")]
-        public async Task<IActionResult> UpdateProd(ProductsLoginWrapper prodlog)
+        public async Task<IActionResult> UpdateProd( ProductsLoginWrapper prodlog)
         {
             var res = await _mongoDBService.UpdateProduct(prodlog.Products, prodlog.Login);
-
+          
             if (res != null)
             {
                 return Ok(res);
@@ -164,7 +165,7 @@ namespace OnlineShoppingAPI.Controllers
         [HttpGet("ListOrders")]
         public async Task<IActionResult> GetOrder(Login login)
         {
-            var orderList = await _mongoDBService.GetOrdersPlaced(login);
+            var orderList= await _mongoDBService.GetOrdersPlaced(login);
             if (orderList != null)
             {
                 return Ok(orderList);
@@ -178,7 +179,7 @@ namespace OnlineShoppingAPI.Controllers
         [HttpGet("{ProductName}/CountOrders")]
         public async Task<IActionResult> GetOrderCount(Login login, string ProductName)
         {
-            var orderCount = await _mongoDBService.GetOrderCount(login, ProductName);
+            var orderCount= await _mongoDBService.GetOrderCount(login, ProductName);
             if (orderCount != null)
             {
                 return Ok(orderCount);
