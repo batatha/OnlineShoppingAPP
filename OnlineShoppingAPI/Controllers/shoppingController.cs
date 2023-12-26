@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Confluent.Kafka;
+using System.Text.Json;
+using System.Diagnostics;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using OnlineShopping.Collection;
 using OnlineShopping.Services;
 using OnlineShoppingAPI.Collection;
@@ -12,6 +16,8 @@ namespace OnlineShoppingAPI.Controllers
     public class shoppingController : ControllerBase
     {
         private readonly MongoDBService _mongoDBService;
+        private readonly string bootstrapServers = "localhost:9092";
+        private readonly string topic = "OnlineShoppingApp";
         public shoppingController(MongoDBService mongoDBService)
         {
             _mongoDBService = mongoDBService;
@@ -23,7 +29,42 @@ namespace OnlineShoppingAPI.Controllers
             return await _mongoDBService.GetAllUsers();
 
         }
+        [HttpPost("producer")]
+        public async Task<IActionResult> Post([FromBody] Login loginRequest)
+        {
+            string message = JsonSerializer.Serialize(loginRequest);
+            return Ok(await SendLoginRequest(topic, message));
+        }
+        private async Task<bool> SendLoginRequest(string topic, string message)
+        {
+            ProducerConfig config = new ProducerConfig
+            {
+                BootstrapServers = bootstrapServers,
+                ClientId = Dns.GetHostName()
+            };
 
+            try
+            {
+                using (var producer = new ProducerBuilder
+                <Null, string>(config).Build())
+                {
+                    var result = await producer.ProduceAsync
+                    (topic, new Message<Null, string>
+                    {
+                        Value = message
+                    });
+
+                    Debug.WriteLine($"Delivery Timestamp:{result.Timestamp.UtcDateTime}");
+                    return await Task.FromResult(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occured: {ex.Message}");
+            }
+
+            return await Task.FromResult(false);
+        }
 
         public class RegistrationLoginWrapper
         {
@@ -57,7 +98,7 @@ namespace OnlineShoppingAPI.Controllers
 
         }
 
-        [HttpGet("{Loginid}/forgot")]
+        [HttpGet("{fname}/forgot")]
         public async Task<ActionResult<string>> GetPassword(string loginid)
         {
             var password = await _mongoDBService.SearchPassword(loginid);
@@ -122,6 +163,15 @@ namespace OnlineShoppingAPI.Controllers
 
             if (res != null)
             {
+                //Display message for kafka  to show product status changed if stock count is less than or equal to 5 or 0
+                ProducerConfig config = new ProducerConfig
+                {
+                    BootstrapServers = bootstrapServers,
+                    ClientId = Dns.GetHostName()
+                };
+                using var producer = new ProducerBuilder<Null, string>(config).Build();
+                var deliveryReport = producer.ProduceAsync(topic, new Message<Null, string> { Value = res }).Result;
+
                 return Ok(res);
             }
             else
@@ -164,6 +214,15 @@ namespace OnlineShoppingAPI.Controllers
             var orderCount = await _mongoDBService.GetOrderCount(login, ProductName);
             if (orderCount != null)
             {
+                ProducerConfig config = new ProducerConfig
+                {
+                    BootstrapServers = bootstrapServers,
+                    ClientId = Dns.GetHostName()
+                };
+                using var producer = new ProducerBuilder<Null, string>(config).Build();
+                var message = orderCount;
+                var deliveryReport = producer.ProduceAsync(topic, new Message<Null, string> { Value = message }).Result;
+
                 return Ok(orderCount);
             }
             else
@@ -192,6 +251,29 @@ namespace OnlineShoppingAPI.Controllers
             if (orderList != null)
             {
                 return Ok(orderList);
+            }
+            else
+            {
+                return BadRequest("Not Allowed");
+            }
+        }
+        //API call for kafka
+        [HttpGet("getStockCount")]
+        public async Task<IActionResult> GetStockCount(Login login)
+        {
+            var stockList = await _mongoDBService.GetStock(login);
+            if (stockList != null)
+            {
+                //kafka log to display orderCount
+                ProducerConfig config = new ProducerConfig
+                {
+                    BootstrapServers = bootstrapServers,
+                    ClientId = Dns.GetHostName()
+                };
+                using var producer = new ProducerBuilder<Null, string>(config).Build();
+                string message = String.Join(", ", stockList);
+                var deliveryReport = producer.ProduceAsync(topic, new Message<Null, string> { Value = message }).Result;
+                return Ok(stockList);
             }
             else
             {

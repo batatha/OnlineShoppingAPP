@@ -283,5 +283,25 @@ namespace OnlineShopping.Services
                 return null;
             }
         }
+        public async Task<List<string>> GetStock(Login login)
+        {
+            bool IsAdminTrue = await IsUserAdmin(login.Loginid, login.Password);
+            if (IsAdminTrue)
+            {
+                var filter = Builders<Products>.Filter.Exists(x => x.StockCount);
+                var list = await _productsCollection.Find(filter).ToListAsync();
+                List<string> plist = new List<string>();
+                foreach (var prd in list)
+                {
+                    plist.Add(prd.ProductName + " : " + prd.StockCount);
+                }
+                return plist;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
     }
 }

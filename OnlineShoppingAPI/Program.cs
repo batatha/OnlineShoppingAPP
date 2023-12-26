@@ -1,8 +1,9 @@
 using OnlineShopping.Models;
 using OnlineShopping.Services;
+using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var logger= NLog.LogManager.GetCurrentClassLogger();
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -11,6 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
 builder.Services.AddSingleton<MongoDBService>();
+builder.Logging.ClearProviders();
+builder.WebHost.UseNLog();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
