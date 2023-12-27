@@ -30,25 +30,25 @@ namespace OnlineShopping.Services
             return await _registrationCollection.Find(new BsonDocument()).ToListAsync();
 
         }
-        private bool IsLoginidExists(string loginid)
+        private bool IsloginIdExists(string loginId)
         {
-            bool exists = _registrationCollection.Find(e => e.Loginid == loginid).Any();
+            bool exists = _registrationCollection.Find(e => e.loginId == loginId).Any();
             return exists;
         }
-        private bool IsEmaildExists(string email)
+        private bool IsemailAddressdExists(string emailAddress)
         {
-            bool exists = _registrationCollection.Find(e => e.Email == email).Any();
+            bool exists = _registrationCollection.Find(e => e.emailAddress == emailAddress).Any();
             return exists;
         }
 
         public async Task<string> CreateUser(Registration registration, Login login)
         {
             //await _registrationCollection.InsertOneAsync(registration);
-            if ((!IsLoginidExists(registration.Loginid)))
+            if ((!IsloginIdExists(registration.loginId)))
             {
-                if (!IsEmaildExists(registration.Email))
+                if (!IsemailAddressdExists(registration.emailAddress))
                 {
-                    if (registration.Password == registration.Confirmpassword && registration.Password==login.Password)
+                    if (registration.password == registration.confirmPassword && registration.password==login.password)
                     {
                         await _registrationCollection.InsertOneAsync(registration);
                         await _loginCollection.InsertOneAsync(login);
@@ -56,12 +56,12 @@ namespace OnlineShopping.Services
                     }
                     else
                     {
-                        return "Passwords must match!";
+                        return "passwords must match!";
                     }
                 }
                 else
                 {
-                    return "Email id already exists!";
+                    return "emailAddress id already exists!";
                 }
             }
             else
@@ -82,20 +82,20 @@ namespace OnlineShopping.Services
             return;
         }
         
-        public async Task<string> SearchPassword(string loginid)
+        public async Task<string> Searchpassword(string loginId)
         {
-            var filter = Builders<Login>.Filter.Eq("Loginid", loginid);
+            var filter = Builders<Login>.Filter.Eq("loginId", loginId);
 
             var result = await _loginCollection.Find(filter).FirstOrDefaultAsync();
 
             if (result != null)
             {
-                string password = result.Password;
+                string password = result.password;
                 return password;
             }
             else
             {
-                return null; // Handle case where loginid is not found
+                return null; // Handle case where loginId is not found
             }
         }
 
@@ -108,7 +108,7 @@ namespace OnlineShopping.Services
         public async Task<List<Products>> SearchProduct(string searchProd)
         {
             var queryExpr = new BsonRegularExpression(new Regex(searchProd, RegexOptions.IgnoreCase));
-            var filter = Builders<Products>.Filter.Regex("ProductName", queryExpr);
+            var filter = Builders<Products>.Filter.Regex("productName", queryExpr);
             return await _productsCollection.Find(filter).ToListAsync();
 
         }
@@ -116,7 +116,7 @@ namespace OnlineShopping.Services
 
         public async Task<string> CreateProduct(Products products,Login login)
         {
-            bool IsAdminTrue = await IsUserAdmin(login.Loginid, login.Password);
+            bool IsAdminTrue = await IsUserAdmin(login.loginId, login.password);
             if (IsAdminTrue)
             {
                 await _productsCollection.InsertOneAsync(products);
@@ -130,21 +130,21 @@ namespace OnlineShopping.Services
 
         public async Task<string> UpdateProduct(Products product,Login login)
         {
-            bool IsAdminTrue = await IsUserAdmin(login.Loginid,login.Password);
+            bool IsAdminTrue = await IsUserAdmin(login.loginId,login.password);
             if (IsAdminTrue)
             {
-                FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("ProductId", product.ProductId);
+                FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("productId", product.productId);
                 UpdateDefinition<Products> updateStockCount = Builders<Products>.Update.Set("StockCount", product.StockCount);
                 if (product.StockCount == 0)
                 {
 
-                    UpdateDefinition<Products> updateProductStatus = Builders<Products>.Update.Set("ProductStatus", "Out of Stock");
-                    await _productsCollection.UpdateOneAsync(filter, updateProductStatus);
+                    UpdateDefinition<Products> updateproductStatus = Builders<Products>.Update.Set("productStatus", "Out of Stock");
+                    await _productsCollection.UpdateOneAsync(filter, updateproductStatus);
                 }
                 else
                 {
-                    UpdateDefinition<Products> updateProductStatus = Builders<Products>.Update.Set("ProductStatus", "Hurry up to purchase");
-                    await _productsCollection.UpdateOneAsync(filter, updateProductStatus);
+                    UpdateDefinition<Products> updateproductStatus = Builders<Products>.Update.Set("productStatus", "Hurry up to purchase");
+                    await _productsCollection.UpdateOneAsync(filter, updateproductStatus);
                 }
                 await _productsCollection.UpdateOneAsync(filter, updateStockCount);
                 return "Product Updated";
@@ -155,9 +155,9 @@ namespace OnlineShopping.Services
             }
            
         }
-        public async Task DeleteProduct(int ProductId) 
+        public async Task DeleteProduct(int productId) 
         {
-            FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("ProductId", ProductId);
+            FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("productId", productId);
             await _productsCollection.DeleteOneAsync(filter);
             return;
         }
@@ -165,13 +165,13 @@ namespace OnlineShopping.Services
 
 //for adding products to check if user is admin from login table
 
-        private async Task<bool> IsUserAdmin(string loginid,string password)
+        private async Task<bool> IsUserAdmin(string loginId,string password)
 
         {
 
-            var filter1 = Builders<Login>.Filter.Where(x => x.Loginid == loginid && x.Role == "Admin" && x.Password==password);
+            var filter1 = Builders<Login>.Filter.Where(x => x.loginId == loginId && x.role == "Admin" && x.password==password);
 
-            //var projection = Builders<Login>.Projection.Include(x => x.Role);
+            //var projection = Builders<Login>.Projection.Include(x => x.role);
 
             var loginCheck = await _loginCollection.Find(filter1).FirstOrDefaultAsync();
 
@@ -197,18 +197,18 @@ namespace OnlineShopping.Services
 
         public async Task<bool> ProductExists(int pid, Orders order)
         {
-            //var filter1 = Builders<Products>.Filter.Eq(x => x.ProductId, pid);
+            //var filter1 = Builders<Products>.Filter.Eq(x => x.productId, pid);
             var filter2 = Builders<Products>.Filter.Eq(x => x.StockCount, pid);
             Console.Write(filter2);
-            var orderIdCheck = _productsCollection.Find(p => p.ProductId == order.ProductId).Any();
+            var orderIdCheck = _productsCollection.Find(p => p.productId == order.productId).Any();
          
 
 
             return orderIdCheck;
         }
-        private async Task<bool> IsUserExist(string loginid,string password)
+        private async Task<bool> IsUserExist(string loginId,string password)
         {
-            var filter1 = Builders<Login>.Filter.Where(x => x.Loginid == loginid && x.Role == "User" && x.Password==password);
+            var filter1 = Builders<Login>.Filter.Where(x => x.loginId == loginId && x.role == "User" && x.password==password);
             var loginCheck = await _loginCollection.Find(filter1).FirstOrDefaultAsync();
 
 
@@ -224,8 +224,8 @@ namespace OnlineShopping.Services
         }
         public async Task<string> CreateOrder(Orders orders, Products product, Login login)
         {
-            bool IsUserTrue = await IsUserExist(login.Loginid,login.Password);
-            bool IsProdTrue = await ProductExists(product.ProductId, orders);
+            bool IsUserTrue = await IsUserExist(login.loginId,login.password);
+            bool IsProdTrue = await ProductExists(product.productId, orders);
             if (IsProdTrue && IsUserTrue)
             {
                 FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("StockCount", product.StockCount);
@@ -242,7 +242,7 @@ namespace OnlineShopping.Services
         }
         public async Task<List<Orders>> GetOrdersPlaced(Login login)
         {
-            bool IsAdminTrue = await IsUserAdmin(login.Loginid,login.Password);
+            bool IsAdminTrue = await IsUserAdmin(login.loginId,login.password);
             if (IsAdminTrue)
             {
                 return await _ordersCollection.Find(new BsonDocument()).ToListAsync();
@@ -258,11 +258,11 @@ namespace OnlineShopping.Services
 
         public async Task<string> GetOrderCount(Login login,string productName)
         {
-            bool IsAdminTrue = await IsUserAdmin(login.Loginid, login.Password);
+            bool IsAdminTrue = await IsUserAdmin(login.loginId, login.password);
             if (IsAdminTrue)
             {
                 //var queryExpr = new BsonRegularExpression(new Regex(productName, RegexOptions.IgnoreCase));
-                var filter = Builders<Orders>.Filter.Eq("ProductName", productName);
+                var filter = Builders<Orders>.Filter.Eq("productName", productName);
                 var count = await _ordersCollection.Find(filter).CountDocumentsAsync();
                 return "Number of "+ productName +": " + Convert.ToInt32(count);
 
@@ -276,10 +276,10 @@ namespace OnlineShopping.Services
         }
         public async Task<List<Products>> GetAvailable(Login login)
         {
-            bool IsAdminTrue = await IsUserAdmin(login.Loginid, login.Password);
+            bool IsAdminTrue = await IsUserAdmin(login.loginId, login.password);
             if (IsAdminTrue)
             {
-                var filter1 = Builders<Products>.Filter.Where(x => x.ProductStatus== "Hurry up to purchase");
+                var filter1 = Builders<Products>.Filter.Where(x => x.productStatus== "Hurry up to purchase");
                 return await _productsCollection.Find(filter1).ToListAsync();
             }
             else

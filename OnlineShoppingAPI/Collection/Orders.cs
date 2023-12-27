@@ -9,15 +9,16 @@ namespace OnlineShoppingAPI.Collection
         [BsonId]
         [BsonElement("_id")]
         public ObjectId _id { get; set; }
+        [BsonElement("orderId")]
         [Required]
-        public int OrderId { get; set; }
-        [BsonElement("ProductId")]
-        public int ProductId { get; set; }
+        public int orderId { get; set; }
+        [BsonElement("productId")]
+        public int productId { get; set; }
         [Required]
-        [BsonElement("ProductName")]
-        public string ProductName { get; set; }
+        [BsonElement("productName")]
+        public string productName { get; set; }
         [Required]
-        [BsonElement("Loginid")]
-        public string? Loginid { get; set; }
+        [BsonElement("loginId")]
+        public string? loginId { get; set; }
     }
 }

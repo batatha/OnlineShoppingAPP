@@ -92,16 +92,16 @@ namespace OnlineShoppingAPI.Controllers
 
 
         [HttpGet("login")]
-        public async Task<List<Login>> GetLogin()
+        public async Task<ActionResult<string>> GetLogin(Login login)
         {
-            return await _mongoDBService.GetLoginUsers();
+            return await _mongoDBService.GetLoginUsers(login);
 
         }
 
-        [HttpGet("{fname}/forgot")]
-        public async Task<ActionResult<string>> GetPassword(string loginid)
+        [HttpGet("{loginId}/forgot")]
+        public async Task<ActionResult<string>> Getpassword(string loginId)
         {
-            var password = await _mongoDBService.SearchPassword(loginid);
+            var password = await _mongoDBService.Searchpassword(loginId);
 
             if (password != null)
             {
@@ -109,7 +109,7 @@ namespace OnlineShoppingAPI.Controllers
             }
             else
             {
-                return NotFound(); // Return HTTP 404 Not Found if loginid is not found
+                return NotFound("User does not exists, please try again"); // Return HTTP 404 Not Found if loginId is not found
             }
         }
 
@@ -134,14 +134,14 @@ namespace OnlineShoppingAPI.Controllers
             return await _mongoDBService.GetProductAll();
 
         }
-        [HttpGet("products/search/{ProductName}")]
-        public async Task<List<Products>> Productsearch(string ProductName)
+        [HttpGet("products/search/{productName}")]
+        public async Task<List<Products>> Productsearch(string productName)
         {
-            return await _mongoDBService.SearchProduct(ProductName);
+            return await _mongoDBService.SearchProduct(productName);
 
         }
 
-        [HttpPost("{ProductName}/add")]
+        [HttpPost("{productName}/add")]
         public async Task<ActionResult<Products>> PostProducts([FromBody] ProductsLoginWrapper prodloginWrapper)
         {
             var prod = await _mongoDBService.CreateProduct(prodloginWrapper.Products, prodloginWrapper.Login);
@@ -156,7 +156,7 @@ namespace OnlineShoppingAPI.Controllers
         }
 
      
-        [HttpPut("{ProductName}/update/{ProductId}")]
+        [HttpPut("{productName}/update/{productId}")]
         public async Task<IActionResult> UpdateProd(ProductsLoginWrapper prodlog)
         {
             var res = await _mongoDBService.UpdateProduct(prodlog.Products, prodlog.Login);
@@ -180,10 +180,10 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
-        [HttpDelete("{ProductName}/delete/{ProductId}")]
-        public async Task<IActionResult> DeleteProd(int ProductId)
+        [HttpDelete("{productName}/delete/{productId}")]
+        public async Task<IActionResult> DeleteProd(int productId)
         {
-            await _mongoDBService.DeleteProduct(ProductId);
+            await _mongoDBService.DeleteProduct(productId);
             return NoContent();
         }
         public class OrdersProductsLoginWrapper
@@ -208,10 +208,10 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
-        [HttpGet("{ProductName}/CountOrders")]
-        public async Task<IActionResult> GetOrderCount(Login login, string ProductName)
+        [HttpGet("{productName}/CountOrders")]
+        public async Task<IActionResult> GetOrderCount(Login login, string productName)
         {
-            var orderCount = await _mongoDBService.GetOrderCount(login, ProductName);
+            var orderCount = await _mongoDBService.GetOrderCount(login, productName);
             if (orderCount != null)
             {
                 ProducerConfig config = new ProducerConfig

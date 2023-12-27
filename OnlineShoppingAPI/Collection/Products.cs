@@ -11,24 +11,24 @@ namespace OnlineShoppingAPI.Collection
         [BsonElement("_id")]
         public ObjectId _id { get; set; }
         [Required]
-        public int ProductId { get; set; }
+        public int productId { get; set; }
         [Required]
-        [BsonElement("ProductName")]
-        public string ProductName { get; set; }
+        [BsonElement("productName")]
+        public string productName { get; set; }
         [Required]
-        [BsonElement("ProductDescription")]
-        public string ProductDescription { get; set; }
+        [BsonElement("productDescription")]
+        public string productDescription { get; set; }
         [Required]
-        [BsonElement("Price")]
-        public double? Price { get; set; }
+        [BsonElement("price")]
+        public double? price { get; set; }
         [Required]
-        [BsonElement("Features")]
-        public string Features { get; set; }
+        [BsonElement("features")]
+        public string features { get; set; }
         [Required]
-        [BsonElement("ProductStatus")]
-        public string ProductStatus { get; set; }
+        [BsonElement("productStatus")]
+        public string productStatus { get; set; }
         [Required]
-        [BsonElement("StockCount")]
-        public int StockCount { get; set; }
+        [BsonElement("stockCount")]
+        public int stockCount { get; set; }
     }
 }

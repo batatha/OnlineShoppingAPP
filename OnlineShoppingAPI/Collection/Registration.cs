@@ -11,32 +11,32 @@ namespace OnlineShopping.Collection
         [BsonElement("_id")]
         public ObjectId _id { get; set; }
         [Required]
-        [BsonElement("Fname")]
-        public string? Fname { get; set; }
+        [BsonElement("firstName")]
+        public string? firstName { get; set; }
         [Required]
-        [BsonElement("Lname")]
-        public string? Lname { get; set; }
+        [BsonElement("lastName")]
+        public string? lastName { get; set; }
         [Required]
-        [BsonElement("Email")]
-        public string? Email { get; set; }
+        [BsonElement("emailAddress")]
+        public string? emailAddress { get; set; }
         [Required]
-        [BsonElement("Loginid")]
-        public string? Loginid { get; set; }
+        [BsonElement("loginId")]
+        public string? loginId { get; set; }
         [Required]
-        [BsonElement("Password")]
-        public string? Password { get; set; }
+        [BsonElement("password")]
+        public string? password { get; set; }
         [Required]
-        [BsonElement("Confirmpassword")]
-        public string? Confirmpassword { get; set; }
+        [BsonElement("confirmPassword")]
+        public string? confirmPassword { get; set; }
         [Required]
-        [BsonElement("Contactno")]
-        public int Contactno { get; set; }
+        [BsonElement("contactNumber")]
+        public int contactNumber { get; set; }
         [BsonDefaultValue("User")]
-        [BsonElement("Role")]
-        public string? Role { get; set; }
+        [BsonElement("role")]
+        public string? role { get; set; }
         public Registration()
         {
-            Role = "User";
+            role = "User";
         }
 
 

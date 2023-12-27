@@ -10,17 +10,17 @@ namespace OnlineShoppingAPI.Collection
         [BsonElement("_id")]
         public ObjectId _id { get; set; }
         [Required]
-        [BsonElement("Loginid")]
-        public string? Loginid { get; set; }
+        [BsonElement("loginId")]
+        public string? loginId { get; set; }
         [Required]
-        [BsonElement("Password")]
-        public string? Password { get; set; }
+        [BsonElement("password")]
+        public string? password { get; set; }
         [BsonDefaultValue("User")]
-        [BsonElement("Role")]
-        public string? Role { get; set; }
+        [BsonElement("role")]
+        public string? role { get; set; }
         public Login()
         {
-            Role = "User";
+            role = "User";
         }
     }
 }
