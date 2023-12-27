@@ -6,8 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using OnlineShopping.Collection;
 using OnlineShopping.Services;
 using OnlineShoppingAPI.Collection;
-
-
+using OnlineShoppingAPI.Services;
 
 namespace OnlineShoppingAPI.Controllers
 {

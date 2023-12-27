@@ -2,6 +2,7 @@ using OnlineShopping.Models;
 using OnlineShopping.Services;
 using NLog.Web;
 using MongoDB.Driver.Core.Configuration;
+using OnlineShoppingAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Set up NLog logger
@@ -19,6 +20,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
 // Register MongoDBService as a singleton
 builder.Services.AddSingleton<MongoDBService>();
+builder.Services.AddSingleton<IEmailService, EmailService>();
 // Clear default logging providers
 builder.Logging.ClearProviders();
 // Use NLog for logging
