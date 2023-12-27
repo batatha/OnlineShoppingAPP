@@ -89,13 +89,25 @@ namespace OnlineShoppingAPI.Controllers
         }
 
 
+        //[HttpGet("login")]
+        //public async Task<List<Login>> GetLogin()
+        //{
+        //    return await _mongoDBService.GetLoginUsers();
 
-
+        //}
         [HttpGet("login")]
-        public async Task<ActionResult<string>> GetLogin(Login login)
+        public async Task<ActionResult<string>> GetLogin(string loginId, string password)
         {
-            return await _mongoDBService.GetLoginUsers(login);
-
+            
+           var result=  await _mongoDBService.UserLoginCheck(loginId,password);
+            if (result != null)
+            {
+                return Ok("Login is successful");
+            }
+            else
+            {
+                return NotFound("User does not exist, please try again");
+            }
         }
 
         [HttpGet("{loginId}/forgot")]

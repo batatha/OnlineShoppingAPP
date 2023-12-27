@@ -30,6 +30,7 @@ namespace OnlineShopping.Services
             return await _registrationCollection.Find(new BsonDocument()).ToListAsync();
 
         }
+
         private bool IsloginIdExists(string loginId)
         {
             bool exists = _registrationCollection.Find(e => e.loginId == loginId).Any();
@@ -219,6 +220,24 @@ namespace OnlineShopping.Services
                 return false;
             }
         }
+
+
+        public async Task<string> UserLoginCheck(string loginId,string password)
+        {
+            var filter= Builders<Login>.Filter.Where(x => x.loginId == loginId && x.password == password);
+
+            var loginCheck = await _loginCollection.Find(filter).FirstOrDefaultAsync();
+
+            if (loginCheck != null)
+            {
+                return "Login is successful";
+            }
+            else
+            {
+                return null; // Handle case where loginId is not found
+            }
+        }
+
         public async Task<string> CreateOrder(Orders orders, Products product, Login login)
         {
             bool IsUserTrue = await IsUserExist(login.loginId,login.password);
