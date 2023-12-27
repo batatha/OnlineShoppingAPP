@@ -120,6 +120,16 @@ namespace OnlineShopping.Services
             }
         }
 
+        //trial check method
+        // Method to get user details based on login ID
+        public async Task<Login> GetUserByLoginId(string loginId)
+        {
+            var filter = Builders<Login>.Filter.Eq("loginId", loginId);
+
+            return await _loginCollection.Find(filter).FirstOrDefaultAsync();
+        }
+
+
         // Method to retrieve all products
 
         public async Task<List<Products>> GetProductAll()

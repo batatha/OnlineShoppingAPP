@@ -117,19 +117,47 @@ namespace OnlineShoppingAPI.Controllers
         }
         // Endpoint to retrieve password based on login ID
 
-        [HttpGet("{loginId}/forgot")]
-        public async Task<ActionResult<string>> Getpassword(string loginId)
-        {
-            var password = await _mongoDBService.Searchpassword(loginId);
+        //[HttpGet("{loginId}/forgot")]
+        //public async Task<ActionResult<string>> Getpassword(string loginId)
+        //{
+        //    var password = await _mongoDBService.Searchpassword(loginId);
 
-            if (password != null)
+        //    if (password != null)
+        //    {
+        //        return Ok(password); // Return HTTP 200 OK with the password
+        //    }
+        //    else
+        //    {
+        //        return NotFound("Invalid login information"); // Return HTTP 404 Not Found if loginId is not found
+        //    }
+        //}
+
+        //trial check
+        [HttpGet("{loginId}/forgot")]
+        public async Task<ActionResult<string>> ForgotPassword(string loginId)
+        {
+            var user = await _mongoDBService.GetUserByLoginId(loginId);
+
+            if (user != null)
             {
-                return Ok(password); // Return HTTP 200 OK with the password
+                // Generate and send a password reset token to the user (for illustration purposes)
+                string resetToken = GeneratePasswordResetToken();
+
+                // You may send the resetToken to the user via email or another secure channel
+
+                return Ok("Password reset token sent successfully.");
             }
             else
             {
-                return NotFound("User does not exists, please try again"); // Return HTTP 404 Not Found if loginId is not found
+                return NotFound("User does not exist, please try again");
             }
+        }
+
+        // For illustration purposes, you can generate a simple reset token
+        private string GeneratePasswordResetToken()
+        {
+            // Logic to generate a secure reset token
+            return Guid.NewGuid().ToString();
         }
 
         // Endpoint to create a new login entry
