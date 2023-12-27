@@ -22,11 +22,16 @@ namespace OnlineShoppingAPI.Controllers
 
         private readonly string bootstrapServers = "localhost:9092";
         private readonly string topic = "OnlineShoppingApp";
+
+        //EmailService for demo purpose
+        private readonly IEmailService _emailService;
+
         // Constructor to inject MongoDB service
 
-        public shoppingController(MongoDBService mongoDBService)
+        public shoppingController(MongoDBService mongoDBService, IEmailService emailService)
         {
             _mongoDBService = mongoDBService;
+            _emailService = emailService;
         }
         // Endpoint to retrieve all users
 
@@ -138,18 +143,18 @@ namespace OnlineShoppingAPI.Controllers
         {
             var user = await _mongoDBService.GetUserByLoginId(loginId);
 
-            if (user != null)
+            if (user != null && !string.IsNullOrEmpty(user.emailAddress))
             {
-                // Generate and send a password reset token to the user (for illustration purposes)
+                // Generate and send a password reset token to the user
                 string resetToken = GeneratePasswordResetToken();
 
-                // You may send the resetToken to the user via email or another secure channel
+                await _emailService.SendPasswordResetEmail(user.emailAddress, resetToken);
 
                 return Ok("Password reset token sent successfully.");
             }
             else
             {
-                return NotFound("User does not exist, please try again");
+                return NotFound("Invalid Login Information.");
             }
         }
 
