@@ -15,13 +15,20 @@ namespace OnlineShoppingAPI.Controllers
     [Route("api/v1.0/[controller]")]
     public class shoppingController : ControllerBase
     {
+        // MongoDB service for database operations
+
         private readonly MongoDBService _mongoDBService;
+        // Kafka configuration
+
         private readonly string bootstrapServers = "localhost:9092";
         private readonly string topic = "OnlineShoppingApp";
+        // Constructor to inject MongoDB service
+
         public shoppingController(MongoDBService mongoDBService)
         {
             _mongoDBService = mongoDBService;
         }
+        // Endpoint to retrieve all users
 
         [HttpGet]
         public async Task<List<Registration>> Get()
@@ -29,14 +36,20 @@ namespace OnlineShoppingAPI.Controllers
             return await _mongoDBService.GetAllUsers();
 
         }
+        // Endpoint to send login request via Kafka producer
+
         [HttpPost("producer")]
         public async Task<IActionResult> Post([FromBody] Login loginRequest)
         {
             string message = JsonSerializer.Serialize(loginRequest);
             return Ok(await SendLoginRequest(topic, message));
         }
+        // Method to send login request using Kafka producer
+
         private async Task<bool> SendLoginRequest(string topic, string message)
         {
+            // Kafka producer configuration
+
             ProducerConfig config = new ProducerConfig
             {
                 BootstrapServers = bootstrapServers,
@@ -45,6 +58,8 @@ namespace OnlineShoppingAPI.Controllers
 
             try
             {
+                // Using statement ensures proper disposal of Kafka producer resources
+
                 using (var producer = new ProducerBuilder
                 <Null, string>(config).Build())
                 {
@@ -65,12 +80,16 @@ namespace OnlineShoppingAPI.Controllers
 
             return await Task.FromResult(false);
         }
+        // Wrapper class to handle registration and login data together
 
         public class RegistrationLoginWrapper
         {
             public Registration Registration { get; set; }
             public Login Login { get; set; }
         }
+
+        // Endpoint to register a new user
+
 
         [HttpPost("register")]
         public async Task<ActionResult<Registration>> PostRegistration([FromBody] RegistrationLoginWrapper wrapper)
@@ -88,19 +107,15 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+        // Endpoint to retrieve all login users
 
-        //[HttpGet("login")]
-        //public async Task<List<Login>> GetLogin()
-        //{
-        //    return await _mongoDBService.GetLoginUsers();
-
-        //}
         [HttpGet("login")]
         public async Task<List<Login>> GetLogin()
         {
             return await _mongoDBService.GetLoginUsers();
 
         }
+        // Endpoint to retrieve password based on login ID
 
         [HttpGet("{loginId}/forgot")]
         public async Task<ActionResult<string>> Getpassword(string loginId)
@@ -117,6 +132,7 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+        // Endpoint to create a new login entry
 
         [HttpPost]
         public async Task<ActionResult<Login>> PostLogin(Login login)
@@ -124,13 +140,15 @@ namespace OnlineShoppingAPI.Controllers
             await _mongoDBService.CreateUserLogin(login);
             return CreatedAtAction(nameof(GetLogin), new { id = login._id }, login);
         }
+        // Wrapper class to handle products and login data together
 
         public class ProductsLoginWrapper
         {
             public Products Products { get; set; }
             public Login Login { get; set; }
         }
-
+        
+        // Endpoint to retrieve all products
 
         [HttpGet("all")]
         public async Task<List<Products>> GetproductsAll()
@@ -138,12 +156,17 @@ namespace OnlineShoppingAPI.Controllers
             return await _mongoDBService.GetProductAll();
 
         }
+
+        // Endpoint to search for products based on a given product name
+
         [HttpGet("products/search/{productName}")]
         public async Task<List<Products>> Productsearch(string productName)
         {
             return await _mongoDBService.SearchProduct(productName);
 
         }
+
+        // Endpoint to add a new product
 
         [HttpPost("{productName}/add")]
         public async Task<ActionResult<Products>> PostProducts([FromBody] ProductsLoginWrapper prodloginWrapper)
@@ -159,7 +182,9 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
-     
+
+        // Endpoint to update product information
+
         [HttpPut("{productName}/update/{productId}")]
         public async Task<IActionResult> UpdateProd(ProductsLoginWrapper prodlog)
         {
@@ -167,7 +192,7 @@ namespace OnlineShoppingAPI.Controllers
 
             if (res != null)
             {
-                //Display message for kafka  to show product status changed if stock count is less than or equal to 5 or 0
+                // kafka displaying message in order to show  product status changed if stock count is less than or equal to 5 or 0
                 ProducerConfig config = new ProducerConfig
                 {
                     BootstrapServers = bootstrapServers,
@@ -184,19 +209,26 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+        // Endpoint to delete a product
+
+
         [HttpDelete("{productName}/delete/{productId}")]
         public async Task<IActionResult> DeleteProd(int productId)
         {
             await _mongoDBService.DeleteProduct(productId);
             return NoContent();
         }
+
+        // Wrapper class to handle orders, products, and login data together
+
         public class OrdersProductsLoginWrapper
         {
             public Products Products { get; set; }
             public Orders orders { get; set; }
             public Login login { get; set; }
         }
-   
+
+        // Endpoint to retrieve a list of orders
 
         [HttpGet("ListOrders")]
         public async Task<IActionResult> GetOrder(Login login)
@@ -212,12 +244,16 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+        // Endpoint to retrieve the count of orders for a specific product
+
         [HttpGet("{productName}/CountOrders")]
         public async Task<IActionResult> GetOrderCount(Login login, string productName)
         {
             var orderCount = await _mongoDBService.GetOrderCount(login, productName);
             if (orderCount != null)
             {
+                // Kafka log to display order count
+
                 ProducerConfig config = new ProducerConfig
                 {
                     BootstrapServers = bootstrapServers,
@@ -234,6 +270,7 @@ namespace OnlineShoppingAPI.Controllers
                 return BadRequest("Not Allowed");
             }
         }
+        // Endpoint to create a new order
 
         [HttpPost("orders")]
         public async Task<IActionResult> PostOrder(OrdersProductsLoginWrapper orpl)
@@ -248,6 +285,8 @@ namespace OnlineShoppingAPI.Controllers
                 return BadRequest(res);
             }
         }
+
+        //call for admin to see the available products
         [HttpGet("available")]
         public async Task<IActionResult> GetAvailableProducts(Login login)
         {
@@ -261,14 +300,14 @@ namespace OnlineShoppingAPI.Controllers
                 return BadRequest("Not Allowed");
             }
         }
-        //API call for kafka
+        //call for kafka message
         [HttpGet("getStockCount")]
         public async Task<IActionResult> GetStockCount(Login login)
         {
             var stockList = await _mongoDBService.GetStock(login);
             if (stockList != null)
             {
-                //kafka log to display orderCount
+                //kafka message for orderCount
                 ProducerConfig config = new ProducerConfig
                 {
                     BootstrapServers = bootstrapServers,
