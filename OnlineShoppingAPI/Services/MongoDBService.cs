@@ -101,7 +101,23 @@ namespace OnlineShopping.Services
             await _loginCollection.InsertOneAsync(login);
             return;
         }
-       
+        // Method to search for a password based on firstName
+
+        public async Task<string> Searchpassword(string firstName)
+        {
+            var filter = Builders<Login>.Filter.Eq("firstName", firstName);
+            var result = await _loginCollection.Find(filter).FirstOrDefaultAsync();
+            if (result != null)
+            {
+                string password = result.password;
+                return password;
+            }
+            else
+            {
+                return null; // Handles case where firstName of customer is not found
+            }
+        }
+
         // Method to get user password based on login ID
         public async Task<Login> GetUserByLoginId(string loginId)
         {

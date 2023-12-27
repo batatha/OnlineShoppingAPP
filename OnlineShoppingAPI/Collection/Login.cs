@@ -31,6 +31,10 @@ namespace OnlineShoppingAPI.Collection
         [BsonElement("emailAddress")]
         public string? emailAddress { get; set; }
 
+        //for reset password function with customer name
+        [BsonElement("emailAddress")]
+        public string? firstName { get; set; }
+
         // Constructor to set the default role to "User"
 
         public Login()

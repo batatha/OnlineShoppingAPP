@@ -119,9 +119,25 @@ namespace OnlineShoppingAPI.Controllers
             return await _mongoDBService.GetLoginUsers();
 
         }
+
+        // Endpoint to retrieve password based on customername
+        [HttpGet("{firstName}/forgot")]
+        public async Task<ActionResult<string>> Getpassword(string firstName)
+        {
+            var password = await _mongoDBService.Searchpassword(firstName);
+            if (password != null)
+            {
+                return Ok(password); // Return HTTP 200 OK with the password
+            }
+            else
+            {
+                return NotFound("User does not exists, please try again"); // Return HTTP 404 Not Found if loginId is not found
+            }
+        }
+
         // Endpoint to retrieve password based on login ID
 
-        [HttpGet("{loginId}/forgot")]
+        [HttpGet("{loginId}/forgotPassword")]
         public async Task<ActionResult<string>> ForgotPassword(string loginId)
         {
             var user = await _mongoDBService.GetUserByLoginId(loginId);
