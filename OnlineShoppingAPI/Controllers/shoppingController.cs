@@ -121,22 +121,6 @@ namespace OnlineShoppingAPI.Controllers
         }
         // Endpoint to retrieve password based on login ID
 
-        //[HttpGet("{loginId}/forgot")]
-        //public async Task<ActionResult<string>> Getpassword(string loginId)
-        //{
-        //    var password = await _mongoDBService.Searchpassword(loginId);
-
-        //    if (password != null)
-        //    {
-        //        return Ok(password); // Return HTTP 200 OK with the password
-        //    }
-        //    else
-        //    {
-        //        return NotFound("Invalid login information"); // Return HTTP 404 Not Found if loginId is not found
-        //    }
-        //}
-
-        //trial check
         [HttpGet("{loginId}/forgot")]
         public async Task<ActionResult<string>> ForgotPassword(string loginId)
         {
@@ -157,7 +141,7 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
-        // For illustration purposes, you can generate a simple reset token
+        // For demo, generating a simple reset token
         private string GeneratePasswordResetToken()
         {
             // Logic to generate a secure reset token
