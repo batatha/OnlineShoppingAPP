@@ -7,6 +7,7 @@ using DnsClient;
 using OnlineShoppingAPI.Collection;
 using System.Text.RegularExpressions;
 using MongoDB.Bson.Serialization;
+using NLog.Fluent;
 
 
 namespace OnlineShopping.Services
@@ -184,7 +185,7 @@ namespace OnlineShopping.Services
                 // Update stock count
 
                 FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("productId", product.productId);
-                UpdateDefinition<Products> updateStockCount = Builders<Products>.Update.Set("StockCount", product.stockCount);
+                UpdateDefinition<Products> updateStockCount = Builders<Products>.Update.Set("stockCount", product.stockCount);
                 // Update product status based on stock count
 
                 if (product.stockCount == 0)
@@ -193,9 +194,14 @@ namespace OnlineShopping.Services
                     UpdateDefinition<Products> updateproductStatus = Builders<Products>.Update.Set("productStatus", "Out of Stock");
                     await _productsCollection.UpdateOneAsync(filter, updateproductStatus);
                 }
-                else
+                else if (product.stockCount <= 5)
                 {
                     UpdateDefinition<Products> updateproductStatus = Builders<Products>.Update.Set("productStatus", "Hurry up to purchase");
+                    await _productsCollection.UpdateOneAsync(filter, updateproductStatus);
+                }
+                else
+                {
+                    UpdateDefinition<Products> updateproductStatus = Builders<Products>.Update.Set("productStatus", "Available");
                     await _productsCollection.UpdateOneAsync(filter, updateproductStatus);
                 }
                 // Apply stock count update
@@ -212,11 +218,21 @@ namespace OnlineShopping.Services
 
         // Method to delete a product
 
-        public async Task DeleteProduct(int productId) 
+        public async Task<string> DeleteProduct(Products product, Login login) 
         {
-            FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("productId", productId);
-            await _productsCollection.DeleteOneAsync(filter);
-            return;
+            // Check if the user is an admin before allowing product update
+
+            bool IsAdminTrue = await IsUserAdmin(login.loginId, login.password);
+            if (IsAdminTrue)
+            {
+                FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("productId", product.productId);
+                await _productsCollection.DeleteOneAsync(filter);
+                return "Product Deleted!";
+            }
+            else
+            {
+                return null;
+            }
         }
       
         //method to add products, condition checking if the user is admin
@@ -252,7 +268,6 @@ namespace OnlineShopping.Services
         public async Task<bool> ProductExists(int pid, Orders order)
         {
             var filter2 = Builders<Products>.Filter.Eq(x => x.stockCount, pid);
-            Console.Write(filter2);
             var orderIdCheck = _productsCollection.Find(p => p.productId == order.productId).Any();
          
 
@@ -302,10 +317,10 @@ namespace OnlineShopping.Services
             bool IsProdTrue = await ProductExists(product.productId, orders);
             if (IsProdTrue && IsUserTrue)
             {
-                FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("StockCount", product.stockCount);
+                FilterDefinition<Products> filter = Builders<Products>.Filter.Eq("stockCount", product.stockCount);
                 var desc = product.stockCount - 1;
-                UpdateDefinition<Products> updateStockCount = Builders<Products>.Update.Set("StockCount", desc);
-                await _productsCollection.UpdateOneAsync(filter, updateStockCount);
+                UpdateDefinition<Products> updatestockCount = Builders<Products>.Update.Set("stockCount", desc);
+                await _productsCollection.UpdateOneAsync(filter, updatestockCount);
                 await _ordersCollection.InsertOneAsync(orders);
                 return "Order created";
             }

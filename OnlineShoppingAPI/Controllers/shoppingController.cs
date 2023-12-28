@@ -92,6 +92,7 @@ namespace OnlineShoppingAPI.Controllers
             public Login Login { get; set; }
         }
 
+        //Ruberic #1
         // Endpoint to register a new user
 
 
@@ -111,6 +112,7 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+        //Ruberic #2
         // Endpoint to retrieve all login users
 
         [HttpGet("login")]
@@ -123,11 +125,12 @@ namespace OnlineShoppingAPI.Controllers
             }
             else
             {
-                return BadRequest(loginCheck);
+                return BadRequest("User not Allowed");
             }
 
         }
 
+        //Ruberic #3
         // Endpoint to retrieve password based on customername
         [HttpGet("{firstName}/forgot")]
         public async Task<ActionResult<string>> Getpassword(string firstName)
@@ -189,6 +192,7 @@ namespace OnlineShoppingAPI.Controllers
             public Login Login { get; set; }
         }
         
+        //Ruberic #4
         // Endpoint to retrieve all products
 
         [HttpGet("all")]
@@ -198,6 +202,7 @@ namespace OnlineShoppingAPI.Controllers
 
         }
 
+        //Ruberic #5
         // Endpoint to search for products based on a given product name
 
         [HttpGet("products/search/{productName}")]
@@ -207,6 +212,7 @@ namespace OnlineShoppingAPI.Controllers
 
         }
 
+        //Ruberic #6
         // Endpoint to add a new product
 
         [HttpPost("{productName}/add")]
@@ -223,7 +229,8 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
-
+        //Ruberic #7
+        //Kafka Requirement #1
         // Endpoint to update product information
 
         [HttpPut("{productName}/update/{productId}")]
@@ -250,14 +257,23 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+
+        //Ruberic #8
         // Endpoint to delete a product
 
 
         [HttpDelete("{productName}/delete/{productId}")]
-        public async Task<IActionResult> DeleteProd(int productId)
+        public async Task<IActionResult> DeleteProd(ProductsLoginWrapper productLogin)
         {
-            await _mongoDBService.DeleteProduct(productId);
-            return NoContent();
+           var deleteProduct = await _mongoDBService.DeleteProduct(productLogin.Products,productLogin.Login);
+            if (deleteProduct != null)
+            {
+                return Ok(deleteProduct);
+            }
+            else
+            {
+                return BadRequest("Not Allowed");
+            }
         }
 
         // Wrapper class to handle orders, products, and login data together
@@ -285,6 +301,8 @@ namespace OnlineShoppingAPI.Controllers
             }
         }
 
+
+        //Kafka Requirement #2
         // Endpoint to retrieve the count of orders for a specific product
 
         [HttpGet("{productName}/CountOrders")]
@@ -341,6 +359,8 @@ namespace OnlineShoppingAPI.Controllers
                 return BadRequest("Not Allowed");
             }
         }
+
+        //Kafka Requirment #3
         //call for kafka message
         [HttpGet("getStockCount")]
         public async Task<IActionResult> GetStockCount(Login login)
