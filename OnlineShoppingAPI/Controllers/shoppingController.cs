@@ -141,7 +141,7 @@ namespace OnlineShoppingAPI.Controllers
         public async Task<ActionResult<string>> ForgotPassword(string loginId)
         {
             var user = await _mongoDBService.GetUserByLoginId(loginId);
-
+            
             if (user != null && !string.IsNullOrEmpty(user.emailAddress))
             {
                 // Generate and send a password reset token to the user

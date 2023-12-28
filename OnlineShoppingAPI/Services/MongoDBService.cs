@@ -105,8 +105,8 @@ namespace OnlineShopping.Services
 
         public async Task<string> Searchpassword(string firstName)
         {
-            var filter = Builders<Login>.Filter.Eq("firstName", firstName);
-            var result = await _loginCollection.Find(filter).FirstOrDefaultAsync();
+            var filter = Builders<Registration>.Filter.Eq("firstName", firstName);
+            var result = await _registrationCollection.Find(filter).FirstOrDefaultAsync();
             if (result != null)
             {
                 string password = result.password;
@@ -122,8 +122,10 @@ namespace OnlineShopping.Services
         public async Task<Login> GetUserByLoginId(string loginId)
         {
             var filter = Builders<Login>.Filter.Eq("loginId", loginId);
+            var em = _registrationCollection.Find(filter).FirstOrDefaultAsync();
 
             return await _loginCollection.Find(filter).FirstOrDefaultAsync();
+
         }
 
 
