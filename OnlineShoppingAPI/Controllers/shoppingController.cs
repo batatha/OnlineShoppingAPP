@@ -140,14 +140,14 @@ namespace OnlineShoppingAPI.Controllers
         [HttpGet("{loginId}/forgotPassword")]
         public async Task<ActionResult<string>> ForgotPassword(string loginId)
         {
-            var user = await _mongoDBService.GetUserByLoginId(loginId);
-            
-            if (user != null && !string.IsNullOrEmpty(user.emailAddress))
+            var registration = await _mongoDBService.GetUserByLoginId(loginId);
+
+            if (registration != null && !string.IsNullOrEmpty(registration.emailAddress))
             {
                 // Generate and send a password reset token to the user
                 string resetToken = GeneratePasswordResetToken();
 
-                await _emailService.SendPasswordResetEmail(user.emailAddress, resetToken);
+                await _emailService.SendPasswordResetEmail(registration.emailAddress, resetToken);
 
                 return Ok("Password reset token sent successfully.");
             }
@@ -156,6 +156,7 @@ namespace OnlineShoppingAPI.Controllers
                 return NotFound("Invalid Login Information.");
             }
         }
+
 
         // For demo, generating a simple reset token
         private string GeneratePasswordResetToken()

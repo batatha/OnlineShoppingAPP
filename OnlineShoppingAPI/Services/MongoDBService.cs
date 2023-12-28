@@ -119,14 +119,12 @@ namespace OnlineShopping.Services
         }
 
         // Method to get user password based on login ID
-        public async Task<Login> GetUserByLoginId(string loginId)
+        public async Task<Registration> GetUserByLoginId(string loginId)
         {
-            var filter = Builders<Login>.Filter.Eq("loginId", loginId);
-            var em = _registrationCollection.Find(filter).FirstOrDefaultAsync();
-
-            return await _loginCollection.Find(filter).FirstOrDefaultAsync();
-
+            var filter = Builders<Registration>.Filter.Eq("loginId", loginId);
+            return await _registrationCollection.Find(filter).FirstOrDefaultAsync();
         }
+
 
 
         // Method to retrieve all products
