@@ -114,9 +114,17 @@ namespace OnlineShoppingAPI.Controllers
         // Endpoint to retrieve all login users
 
         [HttpGet("login")]
-        public async Task<List<Login>> GetLogin()
+        public async Task<ActionResult<string>> GetLogin(Login login)
         {
-            return await _mongoDBService.GetLoginUsers();
+            var loginCheck = await _mongoDBService.GetLoginUsers(login);
+            if (loginCheck != null)
+            {
+                return Ok(loginCheck); // Return HTTP 200 OK with the password
+            }
+            else
+            {
+                return BadRequest(loginCheck);
+            }
 
         }
 

@@ -89,11 +89,22 @@ namespace OnlineShopping.Services
         }
         // Method to retrieve all login users
 
-        public async Task<List<Login>> GetLoginUsers()
+       
+        public async Task<List<Login>> GetLoginUsers(Login login)
         {
-            return await _loginCollection.Find(new BsonDocument()).ToListAsync();
+            // Check if the user is an admin before allowing product creation
 
+            bool IsAdminTrue = await IsUserAdmin(login.loginId, login.password);
+            if (IsAdminTrue)
+            {
+                return await _loginCollection.Find(new BsonDocument()).ToListAsync();
+            }
+            else
+            {
+                return null;
+            }
         }
+
         // Method to create a new login entry
 
         public async Task CreateUserLogin(Login login)
